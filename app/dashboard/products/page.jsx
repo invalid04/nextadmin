@@ -2,9 +2,15 @@ import styles from '../../ui/dashboard/products/products.module.css'
 import Search from '../../ui/dashboard/search/search'
 import Pagination from '../../ui/dashboard/pagination/pagination'
 import Link from 'next/link'
-import Image from 'next/image' 
+import Image from 'next/image'
+import { fetchProducts } from '../../lib/data'
 
-function ProductsPage() {
+async function ProductsPage({ searchParams }) {
+
+  const q = searchParams?.q || "";
+  const page = searchParams?.page || 1;
+  const {count, products} = await fetchProducts(q, page);
+
   return (
     <div className={styles.container}>
         <div className={styles.top}>
@@ -25,43 +31,45 @@ function ProductsPage() {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>
-                <div className={styles.product}>
-                  <Image 
-                    src='/noproduct.jpg'
-                    alt=''
-                    width={40}
-                    height={40}
-                    className={styles.productImage}
-                  />
-                    IPhone
-                </div>
-              </td>
-              <td>Desc</td>
-              <td>$999</td>
-              <td>13.01.2022</td>
-              <td>72</td>
-              <td>
-                <div className={styles.buttons}>
-                  <Link href="/dashboard/products/test">
+            {products.map((product) => (
+              <tr key={product.id}>
+                <td>
+                  <div className={styles.product}>
+                    <Image 
+                      src={product.img || '/noproduct.jpg'}
+                      alt=''
+                      width={40}
+                      height={40}
+                      className={styles.productImage}
+                    />
+                      {product.title}
+                  </div>
+                </td>
+                <td>{product.desc}</td>
+                <td>{product.price}</td>
+                <td>{product.createdAt?.toString().splice(4,16)}</td>
+                <td>{product.stock}</td>
+                <td>
+                  <div className={styles.buttons}>
+                    <Link href={`/dashboard/products/${product.id}`}>
+                      <button 
+                        className={`${styles.button} ${styles.view}`}
+                      >
+                        View
+                      </button>
+                    </Link>
                     <button 
-                      className={`${styles.button} ${styles.view}`}
-                    >
-                      View
-                    </button>
-                  </Link>
-                  <button 
-                      className={`${styles.button} ${styles.delete}`}
-                    >
-                      delete 
-                    </button>   
-                </div> 
-              </td>
-            </tr>
+                        className={`${styles.button} ${styles.delete}`}
+                      >
+                        delete 
+                      </button>   
+                  </div> 
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
-        <Pagination />
+        <Pagination count={count} />
     </div>
   )
 }
