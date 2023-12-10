@@ -4,6 +4,7 @@ import Pagination from '../../ui/dashboard/pagination/pagination'
 import Link from 'next/link'
 import Image from 'next/image'
 import { fetchProducts } from '../../lib/data'
+import { deleteProduct } from '../../lib/actions'
 
 async function ProductsPage({ searchParams }) {
 
@@ -47,7 +48,7 @@ async function ProductsPage({ searchParams }) {
                 </td>
                 <td>{product.desc}</td>
                 <td>{product.price}</td>
-                <td>{product.createdAt?.toString().splice(4,16)}</td>
+                <td>{product.createdAt?.toString().slice(4,16)}</td>
                 <td>{product.stock}</td>
                 <td>
                   <div className={styles.buttons}>
@@ -58,11 +59,14 @@ async function ProductsPage({ searchParams }) {
                         View
                       </button>
                     </Link>
-                    <button 
-                        className={`${styles.button} ${styles.delete}`}
-                      >
-                        delete 
-                      </button>   
+                    <form action={deleteProduct}>
+                      <input type="hidden" name='id' value={product.id} />
+                      <button 
+                          className={`${styles.button} ${styles.delete}`}
+                        >
+                          delete 
+                        </button>  
+                    </form> 
                   </div> 
                 </td>
               </tr>
